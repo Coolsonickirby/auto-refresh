@@ -1,0 +1,24 @@
+[package]
+name = "auto-refresh"
+version = "0.1.0"
+authors = []
+edition = "2018"
+
+[package.metadata.skyline]
+titleid = "01006A800016E000"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
+once_cell = "1.12.0"
+smash-arc = { git = "https://github.com/jam1garner/smash-arc", features = ["smash-runtime", "rust-zstd", "serialize"] }
+arcropolis-api = { git = "https://github.com/Raytwo/arcropolis_api" }
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
