@@ -1,3 +1,4 @@
+use once_cell::sync::Lazy;
 use skyline::hooks::InlineCtx;
 use skyline::{hook, install_hooks};
 use smash_arc::*;
@@ -23,12 +24,10 @@ struct ThreadedFileLoad {
     // and more...
 }
 
-lazy_static! {
-    static ref THREADED_FILES: Mutex<HashMap<u64, HelperThreadedFileInfo>> = {
-        let m = HashMap::new();
-        Mutex::new(m)
-    };
-}
+static THREADED_FILES: Lazy<Mutex<HashMap<u64, HelperThreadedFileInfo>>> = Lazy::new(|| {
+    let mut m = HashMap::new();
+    Mutex::new(m)
+});
 
 fn check_size(loaded_bntx: &[u8], replace: &[u8]) -> Option<usize> {
     if loaded_bntx.len() > 0x1000 && replace.len() > 0x1000 {
@@ -74,7 +73,7 @@ pub fn handle_file_replace(hash: Hash40, replace: &[u8]) -> bool {
 
 #[hook(offset = 0x37a17ac, inline)]
 unsafe fn load_files_threaded_hook(ctx: &mut InlineCtx) {
-    let threaded_load = (*ctx.registers[19].x.as_ref() as *mut ThreadedFileLoad);
+    let threaded_load = *ctx.registers[19].x.as_ref() as *mut ThreadedFileLoad;
 
     let file_path_index = (*threaded_load).file_path_index as usize;
 
@@ -99,7 +98,7 @@ unsafe fn load_files_threaded_hook(ctx: &mut InlineCtx) {
 
 #[hook(offset = 0x37a1470, inline)]
 unsafe fn free_files_threaded_hook(ctx: &mut InlineCtx) {
-    let threaded_load = (*ctx.registers[0].x.as_ref() as *mut ThreadedFileLoad);
+    let threaded_load = *ctx.registers[0].x.as_ref() as *mut ThreadedFileLoad;
 
     let file_path_index = (*threaded_load).file_path_index as usize;
 

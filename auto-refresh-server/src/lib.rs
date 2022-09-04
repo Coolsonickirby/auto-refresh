@@ -126,7 +126,7 @@ pub fn scan_path_for_files(path: &Path) {
 }
 
 #[skyline::main(name = "auto-refresh")]
-pub unsafe fn main() {
+pub fn main() {
     bntx::install();
 
     scan_path_for_files(Path::new(SCAN_DIR));
