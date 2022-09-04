@@ -8,7 +8,9 @@ pub use types::*;
 use crate::offsets;
 
 fn offset_to_addr<T>(offset: usize) -> *mut T {
-    unsafe { (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as usize + offset) as *mut T }
+    unsafe {
+        (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as usize + offset) as *mut T
+    }
 }
 
 pub fn filesystem_info() -> &'static FilesystemInfo {

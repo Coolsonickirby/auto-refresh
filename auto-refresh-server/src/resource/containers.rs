@@ -16,7 +16,8 @@ impl<T> CppVector<T> {
     unsafe fn realloc(&mut self) {
         let current_capacity = self.eos.offset_from(self.start) as usize;
         let current_len = self.end.offset_from(self.start) as usize;
-        let layout = Layout::from_size_align(current_capacity * 2 * std::mem::size_of::<T>(), 1).unwrap();
+        let layout =
+            Layout::from_size_align(current_capacity * 2 * std::mem::size_of::<T>(), 1).unwrap();
         let (new_start, new_eos) = {
             let start = std::alloc::alloc(layout) as *mut T;
             (start, start.add(current_capacity * 2))
@@ -45,7 +46,11 @@ impl<T> CppVector<T> {
             let start = std::alloc::alloc(layout) as *mut T;
             (start, start.add(cap))
         };
-        Self { start, end: start, eos }
+        Self {
+            start,
+            end: start,
+            eos,
+        }
     }
 
     pub fn push(&mut self, val: T) {
@@ -125,7 +130,11 @@ impl<T: Copy + Clone> CppVector<T> {
         };
         let new_slice = unsafe { std::slice::from_raw_parts_mut(start, slice.len()) };
         new_slice.copy_from_slice(slice);
-        Self { start, end: eos, eos }
+        Self {
+            start,
+            end: eos,
+            eos,
+        }
     }
 }
 
@@ -162,7 +171,10 @@ impl<'a, T> IntoIterator for &'a CppVector<T> {
     type Item = &'a T;
 
     fn into_iter(self) -> Self::IntoIter {
-        CppVectorIterator { vector: self, index: 0 }
+        CppVectorIterator {
+            vector: self,
+            index: 0,
+        }
     }
 }
 
@@ -171,7 +183,10 @@ impl<'a, T> IntoIterator for &'a mut CppVector<T> {
     type Item = &'a mut T;
 
     fn into_iter(self) -> Self::IntoIter {
-        CppVectorIteratorMut { vector: self, index: 0 }
+        CppVectorIteratorMut {
+            vector: self,
+            index: 0,
+        }
     }
 }
 
@@ -187,7 +202,9 @@ impl<'a, T> Iterator for CppVectorIterator<'a, T> {
         unsafe {
             if self.vector.start.offset(self.index) != self.vector.end {
                 self.index += 1;
-                Some(std::mem::transmute::<*mut T, &'a T>(self.vector.start.offset(self.index - 1)))
+                Some(std::mem::transmute::<*mut T, &'a T>(
+                    self.vector.start.offset(self.index - 1),
+                ))
             } else {
                 None
             }
@@ -207,7 +224,9 @@ impl<'a, T> Iterator for CppVectorIteratorMut<'a, T> {
         unsafe {
             if self.vector.start.offset(self.index) != self.vector.end {
                 self.index += 1;
-                Some(std::mem::transmute::<*mut T, &'a mut T>(self.vector.start.offset(self.index - 1)))
+                Some(std::mem::transmute::<*mut T, &'a mut T>(
+                    self.vector.start.offset(self.index - 1),
+                ))
             } else {
                 None
             }
@@ -244,7 +263,10 @@ impl<'a> IntoIterator for &'a ResList {
     type Item = &'a LoadInfo;
 
     fn into_iter(self) -> Self::IntoIter {
-        ResListIter { list: self, count: 0 }
+        ResListIter {
+            list: self,
+            count: 0,
+        }
     }
 }
 
@@ -253,7 +275,10 @@ impl<'a> IntoIterator for &'a mut ResList {
     type Item = &'a mut LoadInfo;
 
     fn into_iter(self) -> Self::IntoIter {
-        ResListIterMut { list: self, count: 0 }
+        ResListIterMut {
+            list: self,
+            count: 0,
+        }
     }
 }
 
@@ -279,7 +304,10 @@ impl ResList {
     }
 
     pub fn node_iter(&self) -> NodeIter {
-        NodeIter { list: self, count: 0 }
+        NodeIter {
+            list: self,
+            count: 0,
+        }
     }
 
     pub fn len(&self) -> usize {
