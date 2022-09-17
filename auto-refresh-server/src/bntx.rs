@@ -31,9 +31,8 @@ static THREADED_FILES: Lazy<Mutex<HashMap<u64, HelperThreadedFileInfo>>> = Lazy:
 
 fn check_size(loaded_bntx: &[u8], replace: &[u8]) -> Option<usize> {
     if loaded_bntx.len() > 0x1000 && replace.len() > 0x1000 {
-        let loaded_image_size =
-            usize::from_le_bytes(loaded_bntx[0xFF8..0x1000].try_into().unwrap());
-        let replace_image_size = usize::from_le_bytes(replace[0xFF8..0x1000].try_into().unwrap());
+        let loaded_image_size = usize::from_le_bytes(loaded_bntx[0xFF8..0x1000].try_into().ok()?);
+        let replace_image_size = usize::from_le_bytes(replace[0xFF8..0x1000].try_into().ok()?);
         if loaded_image_size == replace_image_size {
             return Some(loaded_image_size);
         }
@@ -104,15 +103,21 @@ unsafe fn free_files_threaded_hook(ctx: &mut InlineCtx) {
 
     let arc = resource::arc();
 
+    let mut map = THREADED_FILES.lock().unwrap();
+
     if file_path_index < arc.get_file_paths().len() {
         let file_path = &arc.get_file_paths()[file_path_index];
         let path_hash = file_path.path.hash40();
 
-        let mut map = THREADED_FILES.lock().unwrap();
-
         if map.contains_key(&path_hash.as_u64()) {
             map.entry(path_hash.as_u64())
                 .and_modify(|helper| (*helper).is_loaded = false);
+        }
+    } else if file_path_index == 0xFFFFFF {
+        for (hash, load) in map.iter_mut() {
+            if load.data_ptr == (*threaded_load).data_ptr as u64 {
+                load.is_loaded = false;
+            }
         }
     }
 }

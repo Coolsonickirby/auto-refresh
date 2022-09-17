@@ -12,9 +12,6 @@ use std::path::Path;
 use std::sync::Mutex;
 use std::thread;
 
-#[macro_use]
-extern crate lazy_static;
-
 mod bntx;
 mod ffi;
 mod offsets;
