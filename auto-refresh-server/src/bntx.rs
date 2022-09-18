@@ -53,8 +53,8 @@ pub fn handle_file_replace(hash: Hash40, replace: &[u8]) -> bool {
                 )
             };
             if let Some(loaded_image_size) = check_size(loaded_image_slice, replace) {
-                loaded_image_slice[0x1000..loaded_image_size]
-                    .copy_from_slice(&replace[0x1000..loaded_image_size]);
+                loaded_image_slice[0x1000..loaded_image_size + 0x1000]
+                    .copy_from_slice(&replace[0x1000..loaded_image_size + 0x1000]);
                 return true;
             }
             println!("[auto-refresh] Bntx file: {:#X} does not match loaded size, so the refresh request was rejected.", hash.as_u64());
