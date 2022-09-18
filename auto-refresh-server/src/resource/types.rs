@@ -79,7 +79,9 @@ pub struct FilesystemInfo {
 
 impl FilesystemInfo {
     pub fn get_loaded_filepaths(&self) -> &[LoadedFilepath] {
-        unsafe { std::slice::from_raw_parts(self.loaded_filepaths, self.loaded_filepath_len as usize) }
+        unsafe {
+            std::slice::from_raw_parts(self.loaded_filepaths, self.loaded_filepath_len as usize)
+        }
     }
 
     pub fn get_loaded_datas(&self) -> &[LoadedData] {
@@ -87,7 +89,9 @@ impl FilesystemInfo {
     }
 
     pub fn get_loaded_directories(&self) -> &[LoadedDirectory] {
-        unsafe { std::slice::from_raw_parts(self.loaded_directories, self.loaded_directory_len as usize) }
+        unsafe {
+            std::slice::from_raw_parts(self.loaded_directories, self.loaded_directory_len as usize)
+        }
     }
 }
 
